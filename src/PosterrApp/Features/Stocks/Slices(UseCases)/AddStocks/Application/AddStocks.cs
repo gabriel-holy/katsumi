@@ -51,9 +51,9 @@ namespace PosterrApp.Features.Stocks
 
             public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
             {
-                var product = await _db.Products.FindAsync(request.ProductId);
+                var product = await _db.Products.FindAsync(new object[] { request.ProductId }, cancellationToken: cancellationToken);
                 product.QuantityInStock += request.Amount;
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 var result = _mapper.Map<Result>(product);
                 return result;
