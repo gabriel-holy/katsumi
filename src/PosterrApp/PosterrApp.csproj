@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.0-preview.4.20220.10" />
     <PackageReference Include="ForEvolve.DependencyInjection.Modules" Version="2.0.10-gba22fd5a83" />
     <PackageReference Include="ForEvolve.EntityFrameworkCore" Version="2.1.14" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
   </ItemGroup>
 
 </Project>

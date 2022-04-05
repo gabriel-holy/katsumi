@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PosterrApp.Features.Products
+namespace PosterrApp.Features.Users
 {
     public class ListAllProducts
     {

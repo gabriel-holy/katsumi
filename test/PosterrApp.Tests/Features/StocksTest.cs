@@ -2,8 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PosterrApp;
 using PosterrApp.Data;
-using PosterrApp.Features.Stocks;
-using PosterrApp.Features.Stocks.Slices;
+using PosterrApp.Features.Follows;
 using PosterrApp.Models;
 using System.Threading.Tasks;
 
@@ -46,7 +45,7 @@ namespace VerticalApp.Features.Stocks
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 // Act
-                var result = await mediator.Send(new AddStocks.Command
+                var result = await mediator.Send(new AddFollow.Command
                 {
                     ProductId = _productId,
                     Amount = 10
@@ -73,7 +72,7 @@ namespace VerticalApp.Features.Stocks
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 // Act
-                var result = await mediator.Send(new RemoveStocks.Command
+                var result = await mediator.Send(new RemoveFollow.Command
                 {
                     ProductId = _productId,
                     Amount = 10
@@ -94,7 +93,7 @@ namespace VerticalApp.Features.Stocks
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 // Act & Assert
-                await Assert.ThrowsAsync<NotEnoughStockException>(() => mediator.Send(new RemoveStocks.Command
+                await Assert.ThrowsAsync<CantFollowYourselfException>(() => mediator.Send(new RemoveFollow.Command
                 {
                     ProductId = _productId,
                     Amount = 11

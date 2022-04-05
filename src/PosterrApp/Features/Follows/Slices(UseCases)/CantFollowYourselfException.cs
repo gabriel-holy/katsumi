@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace PosterrApp.Features.Stocks.Slices
+namespace PosterrApp.Features.Follows
 {
-    public class NotEnoughStockException : Exception
+    public class CantFollowYourselfException : Exception
     {
-        public NotEnoughStockException(int quantityInStock, int amountToRemove)
+        public CantFollowYourselfException(int quantityInStock, int amountToRemove)
             : base($"You cannot remove {amountToRemove} item(s) when there is only {quantityInStock} item(s) left.")
         {
             QuantityInStock = quantityInStock;

@@ -7,9 +7,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PosterrApp.Features.Stocks
+namespace PosterrApp.Features.Follows
 {
-    public class AddStocks
+    public class RemoveFollow
     {
         public class Command : IRequest<Result>
         {
@@ -52,7 +52,14 @@ namespace PosterrApp.Features.Stocks
             public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
             {
                 var product = await _db.Products.FindAsync(new object[] { request.ProductId }, cancellationToken: cancellationToken);
-                product.QuantityInStock += request.Amount;
+
+                if (request.Amount > product.QuantityInStock)
+                {
+                    throw new NotEnoughStockException(product.QuantityInStock, request.Amount);
+                }
+
+                product.QuantityInStock -= request.Amount;
+
                 await _db.SaveChangesAsync(cancellationToken);
 
                 var result = _mapper.Map<Result>(product);

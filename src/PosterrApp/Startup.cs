@@ -6,6 +6,8 @@ using AutoMapper;
 using MediatR;
 using FluentValidation.AspNetCore;
 using PosterrApp.Infrastructure;
+using System;
+using Microsoft.OpenApi.Models;
 
 namespace PosterrApp
 {
@@ -19,10 +21,24 @@ namespace PosterrApp
             services.AddAutoMapper(currentAssembly);
             services.AddMediatR(currentAssembly);
             services.AddDependencyInjectionModules(currentAssembly);
-            services
-                .AddControllers(options => options.Filters.Add<FluentValidationExceptionFilter>())
-                .AddFluentValidation(config => config.RegisterValidatorsFromAssembly(currentAssembly));
+            services.AddControllers(options => options.Filters.Add<FluentValidationExceptionFilter>())
+                    .AddFluentValidation(config => config.RegisterValidatorsFromAssembly(currentAssembly));
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ThrowFluentValidationExceptionBehavior<,>));
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Posterr MVP API",
+                    Version = "v1",
+                    Description = "This API has the role to provide and manage Homepage and Userpage informations for Posterr Web Front-end",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Gabriel Rio Campo Oliveira",
+                        Email = "gabriel.holy@hotmail.com",
+                    },
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,6 +58,13 @@ namespace PosterrApp
 
             mapper.ConfigurationProvider.AssertConfigurationIsValid();
             app.Seed<Data.ProductContext>();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Posterr MVP API");
+                c.RoutePrefix = string.Empty;
+            });
         }
     }
 }

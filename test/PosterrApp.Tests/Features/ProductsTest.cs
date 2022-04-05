@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using PosterrApp.Data;
 using System.Threading.Tasks;
-using PosterrApp.Features.Products;
 using PosterrApp.Models;
 using Xunit;
+using PosterrApp.Features.Users;
 
 namespace PosterrApp.Features
 {
