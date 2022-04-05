@@ -1,0 +1,2 @@
+
+![](./Vertical-Slices.jpg)
