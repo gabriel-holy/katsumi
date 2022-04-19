@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "KatsumiApp": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "index.html",
+      "applicationUrl": "https://localhost:14001",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
