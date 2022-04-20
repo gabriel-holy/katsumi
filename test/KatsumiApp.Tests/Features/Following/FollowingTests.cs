@@ -168,11 +168,11 @@ namespace KatsumiApp.Tests.Features.Following
                 Assert.Equal(followed, followingResult.FollowedUsername);
             }
 
-            [Fact(DisplayName = "Unfollow with success and find the insertion on database.")]
-            public async Task Unfollow_with_success_and_find_the_insertion_on_database()
+            [Fact(DisplayName = "Try to unfollow an unexisting following.")]
+            public async Task Try_to_unfollow_an_unexisting_following()
             {
                 // Arrange
-                const string followed = "gabriel";
+                const string followed = "unexistentUser";
                 const string follower = "steve";
                 var serviceProvider = _services.BuildServiceProvider();
                 using var scope = serviceProvider.CreateScope();
@@ -195,13 +195,12 @@ namespace KatsumiApp.Tests.Features.Following
                                                      f.FollowerUsername == follower)
                                               .FirstOrDefaultAsync();
 
-                Assert.False(result.FollowingIsActive);
-                Assert.NotNull(followingResult);
-                Assert.Equal(follower, followingResult.FollowerUsername);
-                Assert.Equal(followed, followingResult.FollowedUsername);
+                Assert.Null(result);
+                Assert.Null(followingResult);
             }
 
             [Fact(DisplayName = "Exceed follower username length and receive ValidationException.")]
+
             public async Task Exceed_follower_username_length_and_receive_ValidationException()
             {
                 // Arrange
