@@ -120,19 +120,18 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                         .Take(5)
                         .ToListAsync();
 
-
             private async Task<IEnumerable<SharedPost>> FetchSharedPostsByUsername(string username)
-                => await _sharedPostContext
+     => await _sharedPostContext
 
-                        .SharedPosts
-                            .Include(i=> i.OriginalPost)
-                                .ThenInclude(i => i.PostContent)
-                                    .ThenInclude(i => i.Keywords)
+             .SharedPosts
+                 .Include(i => i.OriginalPost)
+                     .ThenInclude(i => i.PostContent)
+                         .ThenInclude(i => i.Keywords)
 
-                        .Where(post => post.Username == username)
-                        .OrderByDescending(post => post.CreatedAtUtc)
-                        .Take(5)
-                        .ToListAsync();
+             .Where(post => post.Username == username)
+             .OrderByDescending(post => post.CreatedAtUtc)
+             .Take(5)
+             .ToListAsync();
 
             private async Task<IEnumerable<QuotePost>> FetchQuotePostsByUsername(string username)
                 => await _quotePostContext
