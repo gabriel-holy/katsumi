@@ -4,10 +4,21 @@ using System.Collections.Generic;
 
 namespace KatsumiApp.V1.Application.Models.Post
 {
-    public class RegularPost : Base.Post
+    public class RegularPost
     {
-        public RegularPost() => PostContent ??= new Content();
-        public override string Type { get => PostType.Regular.ToString(); }
+        private DateTime _createdAt;
+
+        public RegularPost()
+        {
+            if (Id == Guid.Empty) { Id = Guid.NewGuid(); }
+
+            PostContent ??= new Content();
+        }
+
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public DateTime CreatedAtUtc { get => _createdAt.ToUniversalTime(); set => _createdAt = value; }
+        public string Type { get => PostType.Regular.ToString(); }
         public Content PostContent { get; set; }
 
         public class Content
