@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
 using System.Globalization;
 using static KatsumiApp.V1.Application.Features.UserProfile.UseCases.ListUserProfile;
-using KatsumiApp.V1.Application.Features.UserProfile.UseCases;
 
 namespace KatsumiApp.Tests.Features.Person
 {

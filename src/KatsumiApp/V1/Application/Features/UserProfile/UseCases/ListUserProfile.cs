@@ -3,13 +3,12 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using KatsumiApp.V1.Application.Models;
+using Raven.Client.Documents;
 using System.Collections.Generic;
 using KatsumiApp.V1.Application.Models.Post;
-using KatsumiApp.V1.Application.Features.UserProfile.UseCases;
-using KatsumiApp.V1.Data.EntityFramework.Contexts;
+using KatsumiApp.V1.Data.Raven.Contexts;
+using Raven.Client.Documents.Session;
 
 namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 {
@@ -17,34 +16,18 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
     {
         public class Handler : IRequestHandler<Command, Result>
         {
-            private readonly UserProfileContext _userProfileContext;
-            private readonly FollowingContext _followingContext;
-            private readonly PostContext.RegularPostContext _regularPostContext;
-            private readonly PostContext.SharedPostContext _sharedPostContext;
-            private readonly PostContext.QuotePostContext _quotePostContext;
             private readonly IMapper _mapper;
 
-            public Handler(
-                UserProfileContext userProfileContext,
-                FollowingContext followingContext,
-                PostContext.RegularPostContext regularPostContext,
-                PostContext.SharedPostContext sharedPostContext,
-                PostContext.QuotePostContext quotePostContext,
-                IMapper mapper)
+            public Handler(IMapper mapper)
             {
-                _userProfileContext = userProfileContext ?? throw new ArgumentNullException(nameof(userProfileContext));
-                _followingContext = followingContext ?? throw new ArgumentNullException(nameof(followingContext));
-                _regularPostContext = regularPostContext ?? throw new ArgumentNullException(nameof(regularPostContext));
-                _sharedPostContext = sharedPostContext ?? throw new ArgumentNullException(nameof(sharedPostContext));
-                _quotePostContext = quotePostContext ?? throw new ArgumentNullException(nameof(quotePostContext));
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             }
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var userProfile = (await _userProfileContext.UsersProfiles
+                var userProfile = new Result();/* (await _userProfileContext.UsersProfiles
                                                             .FirstOrDefaultAsync(user => user.Username == command.Username, cancellationToken: cancellationToken))
-                                                            .MapFromDomain(); ;
+                                                            .MapFromDomain(); ;*/
 
                 if (userProfile == null)
                 {
@@ -60,9 +43,11 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 
             private async Task BuildUserProfileComplementaryData(Result userProfileToBuild, string viewerUserName)
             {
-                var fetchTotalFollowersTask = FetchTotalFollowersByUsername(userProfileToBuild.Username);
-                var fetchTotalFollowingTask = FetchTotalFollowingByUsername(userProfileToBuild.Username);
-                var fetchFollowingBetweenUsersTask = FetchFollowingBetweenUsers(viewerUserName, userProfileToBuild.Username);
+                using var followingDatabaseSession = FollowingContext.Following.OpenAsyncSession();
+
+                var fetchTotalFollowersTask = FetchTotalFollowersByUsername(userProfileToBuild.Username, followingDatabaseSession);
+                var fetchTotalFollowingTask = FetchTotalFollowingByUsername(userProfileToBuild.Username, followingDatabaseSession);
+                var fetchFollowingBetweenUsersTask = FetchFollowingBetweenUsers(viewerUserName, userProfileToBuild.Username, followingDatabaseSession);
                 var fetchUserFeed = FetchUserFeed(userProfileToBuild.Username);
 
                 await Task.WhenAll(fetchTotalFollowersTask, fetchTotalFollowingTask, fetchFollowingBetweenUsersTask, fetchUserFeed);
@@ -90,7 +75,7 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                 return userFeed;
             }
 
-            private async Task<IList<object>> ApplyOrdenationAndSizingOnFeed(
+            private static async Task<IList<object>> ApplyOrdenationAndSizingOnFeed(
                 Task<IEnumerable<RegularPost>> regularPosts,
                 Task<IEnumerable<SharedPost>> sharedPosts,
                 Task<IEnumerable<QuotePost>> quotePosts)
@@ -109,7 +94,7 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
             }
 
             private async Task<IEnumerable<RegularPost>> FetchRegularPostsByUsername(string username)
-                => await _regularPostContext
+                => null; /* await _regularPostContext
 
                         .RegularPosts
                             .Include(i => i.PostContent)
@@ -119,22 +104,23 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                         .OrderByDescending(post => post.CreatedAtUtc)
                         .Take(5)
                         .ToListAsync();
-
+                */
             private async Task<IEnumerable<SharedPost>> FetchSharedPostsByUsername(string username)
-     => await _sharedPostContext
+                 => null;/* await _sharedPostContext
 
-             .SharedPosts
-                 .Include(i => i.OriginalPost)
-                     .ThenInclude(i => i.PostContent)
-                         .ThenInclude(i => i.Keywords)
+                         .SharedPosts
+                             .Include(i => i.OriginalPost)
+                                 .ThenInclude(i => i.PostContent)
+                                     .ThenInclude(i => i.Keywords)
 
-             .Where(post => post.Username == username)
-             .OrderByDescending(post => post.CreatedAtUtc)
-             .Take(5)
-             .ToListAsync();
+                         .Where(post => post.Username == username)
+                         .OrderByDescending(post => post.CreatedAtUtc)
+                         .Take(5)
+                         .ToListAsync();
+            */
 
             private async Task<IEnumerable<QuotePost>> FetchQuotePostsByUsername(string username)
-                => await _quotePostContext
+                => null; /*await _quotePostContext
 
                         .QuotePosts
                             .Include(i => i.OriginalPost)
@@ -145,26 +131,31 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                         .Where(post => post.Username == username)
                         .OrderByDescending(post => post.CreatedAtUtc)
                         .Take(5)
-                        .ToListAsync();
+                        .ToListAsync();*/
 
-            private async Task<int> FetchTotalFollowersByUsername(string username)
-                => await _followingContext
-                        .Followings
-                        .Where(following => following.FollowingIsActive && following.FollowedUsername == username)
-                        .CountAsync();
+            private static async Task<int> FetchTotalFollowersByUsername(string username, IAsyncDocumentSession databaseSession)
+            {
+                return await databaseSession
+                             .Query<Models.Following>()
+                             .Where(following => following.FollowingIsActive && following.FollowedUsername == username)
+                             .CountAsync();
+            }
+            private static async Task<int> FetchTotalFollowingByUsername(string username, IAsyncDocumentSession databaseSession)
+            {
+                return await databaseSession
+                             .Query<Models.Following>()
+                             .Where(following => following.FollowingIsActive && following.FollowerUsername == username)
+                             .CountAsync();
+            }
 
-            private async Task<int> FetchTotalFollowingByUsername(string username)
-                => await _followingContext
-                        .Followings
-                        .Where(following => following.FollowingIsActive && following.FollowerUsername == username)
-                        .CountAsync();
-
-            private async Task<bool> FetchFollowingBetweenUsers(string viewerUsername, string username)
-                => await _followingContext
-                        .Followings
-                        .AnyAsync(following => following.FollowingIsActive &&
-                                    following.FollowerUsername == viewerUsername &&
-                                    following.FollowedUsername == username);
+            private static async Task<bool> FetchFollowingBetweenUsers(string viewerUsername, string username, IAsyncDocumentSession databaseSession)
+            {
+                return await databaseSession
+                            .Query<Models.Following>()
+                            .AnyAsync(following => following.FollowingIsActive &&
+                                        following.FollowerUsername == viewerUsername &&
+                                        following.FollowedUsername == username);
+            }
         }
 
         public class Command : IRequest<Result>

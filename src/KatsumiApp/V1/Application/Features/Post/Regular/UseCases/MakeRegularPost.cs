@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using KatsumiApp.V1.Application.Models.Post;
 using System.Collections.Generic;
 using System.Linq;
-using KatsumiApp.V1.Application.Features.Post.Regular.UseCases;
 using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Post.Regular.UseCases

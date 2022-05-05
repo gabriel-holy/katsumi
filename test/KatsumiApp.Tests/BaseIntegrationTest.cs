@@ -19,12 +19,12 @@ namespace KatsumiApp.Tests
 
             new Startup().ConfigureServices(_services);
 
-            RemoveDbContext<FollowingContext>();
+            //RemoveDbContext<FollowingContext>();
 
-            _services.AddDbContext<FollowingContext>(options => options
-                .UseInMemoryDatabase(nameof(FollowingContext))
-                .ConfigureWarnings(builder => builder.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-            );
+            //_services.AddDbContext<FollowingContext>(options => options
+            //    .UseInMemoryDatabase(nameof(FollowingContext))
+            //    .ConfigureWarnings(builder => builder.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+            //);
 
             RemoveDbContext<UserProfileContext>();
 
@@ -34,31 +34,31 @@ namespace KatsumiApp.Tests
           );
         }
 
-        protected virtual async Task SeedAsync(FollowingContext db)
-        {
-            await db.Followings.AddAsync(new Following
-            {
-                FollowedUsername = "gabriel",
-                FollowerUsername = "steve",
-                FollowingIsActive = true,
-            });
+        //protected virtual async Task SeedAsync(FollowingContext db)
+        //{
+        //    await db.Followings.AddAsync(new Following
+        //    {
+        //        FollowedUsername = "gabriel",
+        //        FollowerUsername = "steve",
+        //        FollowingIsActive = true,
+        //    });
 
-            await db.Followings.AddAsync(new Following
-            {
-                FollowedUsername = "gabriel",
-                FollowerUsername = "lucas",
-                FollowingIsActive = true,
-            });
+        //    await db.Followings.AddAsync(new Following
+        //    {
+        //        FollowedUsername = "gabriel",
+        //        FollowerUsername = "lucas",
+        //        FollowingIsActive = true,
+        //    });
 
-            await db.Followings.AddAsync(new Following
-            {
-                FollowedUsername = "lucas",
-                FollowerUsername = "gabriel",
-                FollowingIsActive = true,
-            });
+        //    await db.Followings.AddAsync(new Following
+        //    {
+        //        FollowedUsername = "lucas",
+        //        FollowerUsername = "gabriel",
+        //        FollowingIsActive = true,
+        //    });
 
-            await db.SaveChangesAsync();
-        }
+        //    await db.SaveChangesAsync();
+        //}
 
         protected virtual async Task SeedAsync(UserProfileContext db)
         {
@@ -102,10 +102,10 @@ namespace KatsumiApp.Tests
 
         public async Task InitializeAsync()
         {
-            await SeedAsync(_services
-                .BuildServiceProvider()
-                .CreateScope().ServiceProvider
-                .GetRequiredService<FollowingContext>());
+            //await SeedAsync(_services
+            //    .BuildServiceProvider()
+            //    .CreateScope().ServiceProvider
+            //    .GetRequiredService<FollowingContext>());
 
             await SeedAsync(_services
                .BuildServiceProvider()

@@ -6,7 +6,6 @@ using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Serilog;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

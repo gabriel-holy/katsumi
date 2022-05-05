@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using Raven.Client.Documents;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Data.EntityFramework.Contexts;
+using KatsumiApp.V1.Data.Raven.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
 {
@@ -14,22 +14,21 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
     {
         public class Handler : IRequestHandler<Command, Result>
         {
-            private readonly FollowingContext _followingContext;
             private readonly IMapper _mapper;
             private const bool Inactivate = false;
 
-            public Handler(FollowingContext followingContext, IMapper mapper)
+            public Handler(IMapper mapper)
             {
-                _followingContext = followingContext ?? throw new ArgumentNullException(nameof(followingContext));
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             }
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var following = await _followingContext.Followings
-                                         .Where(f => f.FollowedUsername == command.FollowedUsername &&
-                                                     f.FollowerUsername == command.FollowerUsername)
-                                         .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+                using var databaseSession = FollowingContext.Following.OpenAsyncSession();
+
+                var following = await databaseSession
+                                         .Query<Models.Following>()
+                                         .SingleOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername, token: cancellationToken);
 
                 if (following is null)
                 {
@@ -38,7 +37,7 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
 
                 following.FollowingIsActive = Inactivate;
 
-                await _followingContext.SaveChangesAsync(cancellationToken);
+                await databaseSession.SaveChangesAsync(cancellationToken);
 
                 var result = _mapper.Map<Result>(following);
 
@@ -64,7 +63,7 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
                 CreateMap<Models.Following, Result>();
             }
         }
-        
+
         public class Validator : AbstractValidator<Command>
         {
             public Validator()

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using KatsumiApp.V1.Infrastructure;
 using Serilog;
-using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp
 {

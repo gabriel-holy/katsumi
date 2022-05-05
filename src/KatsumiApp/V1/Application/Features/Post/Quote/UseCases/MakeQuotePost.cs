@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using KatsumiApp.V1.Application.Models.Post;
 using Microsoft.EntityFrameworkCore;
-using KatsumiApp.V1.Application.Features.Post.Quote.UseCases;
 using KatsumiApp.V1.Application.Exceptions.Post;
 using KatsumiApp.V1.Data.EntityFramework.Contexts;
 

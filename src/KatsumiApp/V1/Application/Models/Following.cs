@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace KatsumiApp.V1.Application.Models
+﻿namespace KatsumiApp.V1.Application.Models
 {
     public class Following
     {

@@ -10,11 +10,6 @@ namespace KatsumiApp.V1.Data.EntityFramework
     {
         public DependencyInjectionDataModule(IServiceCollection services) : base(services)
         {
-            services.AddDbContext<FollowingContext>(options => options
-                .UseInMemoryDatabase(nameof(FollowingContext))
-                .ConfigureWarnings(builder => builder.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-            );
-
             services.AddDbContext<UserProfileContext>(options => options
                 .UseInMemoryDatabase(nameof(UserProfileContext))
                 .ConfigureWarnings(builder => builder.Ignore(InMemoryEventId.TransactionIgnoredWarning))
