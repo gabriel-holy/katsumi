@@ -5,8 +5,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using KatsumiApp.V1.Data.Contexts;
 using KatsumiApp.V1.Application.Models;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp.Tests
 {

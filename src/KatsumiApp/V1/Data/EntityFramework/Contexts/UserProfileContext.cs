@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using KatsumiApp.V1.Application.Models;
 
-namespace KatsumiApp.V1.Data.Contexts
+namespace KatsumiApp.V1.Data.EntityFramework.Contexts
 {
     public class UserProfileContext : DbContext
     {

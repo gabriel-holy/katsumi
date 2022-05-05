@@ -3,11 +3,11 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Data.Contexts;
 using KatsumiApp.V1.Application.Models.Post;
 using Microsoft.EntityFrameworkCore;
 using KatsumiApp.V1.Application.Features.Post.Quote.UseCases;
 using KatsumiApp.V1.Application.Exceptions.Post;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Post.Quote.UseCases
 {
@@ -51,13 +51,13 @@ namespace KatsumiApp.V1.Application.Features.Post.Quote.UseCases
         {
             public string Username { get; set; }
             public string Comment { get; set; }
-            public Guid OrigitalPostId { get; set; }
+            public string OrigitalPostId { get; set; }
 
         }
 
         public class Result
         {
-            public Guid Id { get; set; }
+            public string Id { get; set; }
         }
     }
 

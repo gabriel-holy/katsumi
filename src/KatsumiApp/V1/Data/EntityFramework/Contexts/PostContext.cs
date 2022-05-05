@@ -1,7 +1,7 @@
 ﻿using KatsumiApp.V1.Application.Models.Post;
 using Microsoft.EntityFrameworkCore;
 
-namespace KatsumiApp.V1.Data.Contexts
+namespace KatsumiApp.V1.Data.EntityFramework.Contexts
 {
     public class PostContext
     {

@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using KatsumiApp.V1.Data.Contexts;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
-namespace KatsumiApp.V1.Data
+namespace KatsumiApp.V1.Data.EntityFramework
 {
     public class DependencyInjectionDataModule : DependencyInjectionModule
     {

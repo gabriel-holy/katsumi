@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using KatsumiApp.V1.Data.Contexts;
 using KatsumiApp.V1.Infrastructure;
 using Serilog;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp
 {
@@ -83,8 +83,8 @@ namespace KatsumiApp
 
             mapper.ConfigurationProvider.AssertConfigurationIsValid();
 
-            app.Seed<FollowingContext>();
-            app.Seed<UserProfileContext>();
+            //app.Seed<FollowingContext>();
+            //app.Seed<UserProfileContext>();
 
             app.UseSwagger();
 

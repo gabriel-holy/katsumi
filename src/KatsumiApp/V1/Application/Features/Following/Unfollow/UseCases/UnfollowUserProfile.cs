@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Data.Contexts;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
 {

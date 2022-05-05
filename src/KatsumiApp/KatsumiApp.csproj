@@ -30,6 +30,7 @@
     <PackageReference Include="ForEvolve.DependencyInjection.Modules" Version="2.0.10-gba22fd5a83" />
     <PackageReference Include="ForEvolve.EntityFrameworkCore" Version="2.1.14" />
     <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="RavenDB.Client" Version="5.3.102" />
     <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
     <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
     <PackageReference Include="Serilog.Enrichers.AspNetCore.HttpContext" Version="1.0.1" />

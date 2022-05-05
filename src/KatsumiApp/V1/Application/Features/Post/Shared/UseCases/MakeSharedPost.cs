@@ -3,11 +3,11 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Data.Contexts;
 using KatsumiApp.V1.Application.Models.Post;
 using KatsumiApp.V1.Application.Features.Post.Shared.UseCases;
 using KatsumiApp.V1.Application.Exceptions.Post;
 using Microsoft.EntityFrameworkCore;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
 {
@@ -46,13 +46,13 @@ namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
 
         public class Command : IRequest<Result>
         {
-            public Guid OrigitalPostId { get; set; }
+            public string OrigitalPostId { get; set; }
             public string Username { get; set; }
         }
 
         public class Result
         {
-            public Guid Id { get; set; }
+            public string Id { get; set; }
         }
     }
 

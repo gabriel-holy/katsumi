@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using KatsumiApp.V1.Data.Raven.Contexts;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
+using Serilog;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Data.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Following.Follow.UseCases
 {
@@ -14,22 +16,22 @@ namespace KatsumiApp.V1.Application.Features.Following.Follow.UseCases
     {
         public class Handler : IRequestHandler<Command, Result>
         {
-            private readonly FollowingContext _followingContext;
             private readonly IMapper _mapper;
             private const bool Activate = true;
 
-            public Handler(FollowingContext followingContext, IMapper mapper)
+            public Handler(IMapper mapper)
             {
-                _followingContext = followingContext ?? throw new ArgumentNullException(nameof(followingContext));
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             }
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var following = await _followingContext.Followings
-                                         .Where(f => f.FollowedUsername == command.FollowedUsername &&
-                                                     f.FollowerUsername == command.FollowerUsername)
-                                         .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+                using var databaseSession = FollowingContext.Following.OpenAsyncSession();
+
+                var following = await databaseSession.Query<Models.Following>()
+                                               .Statistics(out QueryStatistics databaseSessionStatistics)
+                                               .SingleOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername,
+                                                                          token: cancellationToken);
 
                 if (following is null)
                 {
@@ -40,14 +42,16 @@ namespace KatsumiApp.V1.Application.Features.Following.Follow.UseCases
                         FollowingIsActive = Activate
                     };
 
-                    await _followingContext.AddAsync(following, cancellationToken);
+                    await databaseSession.StoreAsync(following, cancellationToken);
                 }
 
                 following.FollowingIsActive = Activate;
 
-                await _followingContext.SaveChangesAsync(cancellationToken);
+                await databaseSession.SaveChangesAsync(cancellationToken);
 
                 var result = _mapper.Map<Result>(following);
+
+                Log.Information($"A following between {command.FollowerUsername} and {command.FollowedUsername} has been modified. Total time taken: {databaseSessionStatistics.DurationInMs} ms");
 
                 return result;
             }

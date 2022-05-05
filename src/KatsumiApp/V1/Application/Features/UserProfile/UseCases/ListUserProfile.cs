@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using KatsumiApp.V1.Application.Models;
-using KatsumiApp.V1.Data.Contexts;
 using System.Collections.Generic;
 using KatsumiApp.V1.Application.Models.Post;
 using KatsumiApp.V1.Application.Features.UserProfile.UseCases;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 {
@@ -180,7 +180,7 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                 if (Feed == null) Feed = new UserFeed();
             }
 
-            public Guid Id { get; set; }
+            public string Id { get; set; }
             public string Username { get; set; }
             public DateTime JoinedSocialMediaAt { get; set; }
             public string JoinedSocialMediaAtFormated => "Katsumi's member since " + JoinedSocialMediaAt.ToString("MMMM dd, yyyy");

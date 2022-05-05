@@ -2,11 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Xunit;
-using KatsumiApp.V1.Data.Contexts;
 using KatsumiApp.V1.Application.Features.Following.Follow.UseCases;
 using KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
 namespace KatsumiApp.Tests.Features.Following
 {

@@ -1,8 +1,8 @@
 ﻿using ForEvolve.EntityFrameworkCore.Seeders;
 using KatsumiApp.V1.Application.Models;
-using KatsumiApp.V1.Data.Contexts;
+using KatsumiApp.V1.Data.EntityFramework.Contexts;
 
-namespace KatsumiApp.V1.Data.Seeders
+namespace KatsumiApp.V1.Data.EntityFramework.Seeders
 {
     public class UserProfileSeeder : ISeeder<UserProfileContext>
     {
@@ -12,7 +12,7 @@ namespace KatsumiApp.V1.Data.Seeders
             {
                 Username = "adam",
                 JoinedSocialMediaAt = new System.DateTime(2015, 06, 20),
-               
+
             });
 
             db.UsersProfiles.Add(new UserProfile
