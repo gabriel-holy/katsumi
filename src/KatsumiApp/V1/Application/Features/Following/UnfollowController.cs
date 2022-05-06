@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using FluentValidation;
-using KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases;
+using KatsumiApp.V1.Application.Features.Following.UseCases;
 
-namespace KatsumiApp.V1.Application.Features.Following.Unfollow
+namespace KatsumiApp.V1.Application.Features.Following
 {
     [ApiController]
     [ControllerName("Following")]

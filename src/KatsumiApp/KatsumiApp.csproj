@@ -37,8 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="V1\Data\EventBus\" />
-    <Folder Include="V1\Data\Kafka\" />
+    <Folder Include="V1\Application\Features\Following\DomainEvents\" />
+    <Folder Include="V1\Application\Features\Post\DomainEvents\" />
     <Folder Include="V1\Data\RabbitMQ\" />
   </ItemGroup>
 

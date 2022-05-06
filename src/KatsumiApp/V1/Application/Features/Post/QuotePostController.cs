@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Application.Features.Post.Quote.UseCases;
-using KatsumiApp.V1.Application.Exceptions.Post;
+using Serilog;
+using KatsumiApp.V1.Application.Features.Post.UseCases;
 
-namespace KatsumiApp.V1.Application.Features.Post.Quote
+namespace KatsumiApp.V1.Application.Features.Post
 {
 
     [ApiController]
@@ -26,6 +26,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Quote
         }
 
         [HttpPut("quote/")]
+        [ProducesResponseType(typeof(MakeQuotePost.Result), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(MakeQuotePost.Result), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(MakeQuotePost.Result), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(MakeQuotePost.Result), StatusCodes.Status200OK)]
@@ -42,8 +43,10 @@ namespace KatsumiApp.V1.Application.Features.Post.Quote
 
                 return NotFound();
             }
-            catch (OriginalPostNotFoundException ex)
+            catch (FluentValidation.ValidationException ex)
             {
+                Log.Error(ex, ex.Message);
+
                 return BadRequest(ex.Message);
             }
         }

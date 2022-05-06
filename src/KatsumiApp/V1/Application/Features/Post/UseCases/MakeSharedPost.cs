@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 using KatsumiApp.V1.Application.Models.Post;
 using Raven.Client.Documents;
 using KatsumiApp.V1.Data.Raven.Contexts;
-using KatsumiApp.V1.Application.Exceptions.Post;
 
-namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
+namespace KatsumiApp.V1.Application.Features.Post.UseCases
 {
     public class MakeSharedPost
     {
@@ -21,7 +20,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
 
                 if (originalPost == null)
                 {
-                    throw new OriginalPostNotFoundException(command.OriginalPostId);
+                    throw new Exception($"Original post {command.OriginalPostId} not found to be shared or quoted.");
                 }
 
                 using var sharedPostDatabaseSession = PostContext.SharedPostContext.DocumentStore.OpenAsyncSession();

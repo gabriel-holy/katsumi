@@ -1,21 +1,22 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using KatsumiApp.V1.Data.Raven.Contexts;
 using MediatR;
-using System;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
+using Serilog;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Data.Raven.Contexts;
 
-namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
+namespace KatsumiApp.V1.Application.Features.Following.UseCases
 {
-    public class UnfollowUserProfile
+    public class FollowUserProfile
     {
         public class Handler : IRequestHandler<Command, Result>
         {
             private readonly IMapper _mapper;
-            private const bool Inactivate = false;
-
+            private const bool Activate = true;
             public Handler(IMapper mapper)
             {
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -25,20 +26,31 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
             {
                 using var databaseSession = FollowingContext.DocumentStore.OpenAsyncSession();
 
-                var following = await databaseSession
-                                         .Query<Models.Following>()
-                                         .FirstOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername, token: cancellationToken);
+                var following = await databaseSession.Query<Models.Following>()
+                                                     .Statistics(out QueryStatistics databaseSessionStatistics)
+                                                     .FirstOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername &&
+                                                                               f.FollowerUsername == command.FollowerUsername,
+                                                                               token: cancellationToken);
 
                 if (following is null)
                 {
-                    return null;
+                    following = new Models.Following()
+                    {
+                        FollowedUsername = command.FollowedUsername,
+                        FollowerUsername = command.FollowerUsername,
+                        FollowingIsActive = Activate
+                    };
+
+                    await databaseSession.StoreAsync(following, cancellationToken);
                 }
 
-                following.FollowingIsActive = Inactivate;
+                following.FollowingIsActive = Activate;
 
                 await databaseSession.SaveChangesAsync(cancellationToken);
 
                 var result = _mapper.Map<Result>(following);
+
+                Log.Information($"A following between {command.FollowerUsername} and {command.FollowedUsername} has been modified. Total time taken: {databaseSessionStatistics.DurationInMs} ms");
 
                 return result;
             }
@@ -52,10 +64,11 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
 
         public class Result
         {
+            public string Id { get; set; }
             public bool FollowingIsActive { get; set; }
         }
 
-        private class Mapper : Profile
+        public class Mapper : Profile
         {
             public Mapper()
             {
@@ -70,14 +83,13 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
                 const int MaximumUsernameLength = 14;
 
                 RuleFor(x => x.FollowerUsername)
-                        .NotEmpty()
-                        .NotNull()
-                        .MaximumLength(MaximumUsernameLength);
+                    .NotEmpty()
+                    .NotNull()
+                    .MaximumLength(MaximumUsernameLength);
 
                 RuleFor(x => x.FollowerUsername)
                     .Matches(@"^[0-9a-zA-Z ]+$")
                     .WithMessage("Just numbers and letters are allowed.");
-
 
                 RuleFor(x => x.FollowedUsername)
                     .NotEmpty()
@@ -87,6 +99,10 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
                 RuleFor(x => x.FollowedUsername)
                     .Matches(@"^[0-9a-zA-Z ]+$")
                     .WithMessage("Just numbers and letters are allowed.");
+
+                RuleFor(x => x)
+                    .Must(x => x.FollowedUsername != x.FollowerUsername)
+                    .WithMessage(x => $"{x.FollowerUsername}, you cannot follow yourself.");
             }
         }
     }

@@ -2,8 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-
-namespace KatsumiApp.V1.DomainEvents.Features.UserProfile
+namespace KatsumiApp.V1.Application.Features.UserProfile.DomainEvents
 {
     public class UserProfileCreatedEvent
     {

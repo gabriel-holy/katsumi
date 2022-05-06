@@ -1,9 +1,8 @@
-﻿using MediatR;
+﻿using KatsumiApp.V1.Application.Features.Following.UseCases;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Xunit;
-using KatsumiApp.V1.Application.Features.Following.Follow.UseCases;
-using KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases;
 
 namespace KatsumiApp.Tests.Features.Following
 {
@@ -207,7 +206,7 @@ namespace KatsumiApp.Tests.Features.Following
             var followed = "gabriel";
 
             // Act & Assert
-            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new UnfollowUserProfile.Command
+            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new FollowUserProfile.Command
             {
                 FollowerUsername = tooBigUsername,
                 FollowedUsername = followed
@@ -224,7 +223,7 @@ namespace KatsumiApp.Tests.Features.Following
             var follower = "gabriel";
 
             // Act & Assert
-            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new UnfollowUserProfile.Command
+            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new FollowUserProfile.Command
             {
                 FollowerUsername = follower,
                 FollowedUsername = tooBigUsername
@@ -241,7 +240,7 @@ namespace KatsumiApp.Tests.Features.Following
             var follower = "gabriel";
 
             // Act & Assert
-            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new UnfollowUserProfile.Command
+            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new FollowUserProfile.Command
             {
                 FollowerUsername = follower,
                 FollowedUsername = specialCharactersUsername
@@ -258,7 +257,7 @@ namespace KatsumiApp.Tests.Features.Following
             var follower = "adam";
 
             // Act & Assert
-            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new UnfollowUserProfile.Command
+            await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => mediator.Send(new FollowUserProfile.Command
             {
                 FollowerUsername = follower,
                 FollowedUsername = specialCharactersUsername

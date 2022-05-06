@@ -1,11 +1,11 @@
-﻿using KatsumiApp.V1.Application.Features.Post.Regular.UseCases;
+﻿using KatsumiApp.V1.Application.Features.Post.UseCases;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace KatsumiApp.V1.Application.Features.Post.Regular
+namespace KatsumiApp.V1.Application.Features.Post
 {
 
     [ApiController]
@@ -25,7 +25,6 @@ namespace KatsumiApp.V1.Application.Features.Post.Regular
 
         [HttpPut()]
         [SwaggerOrder(1)]
-
         [ProducesResponseType(typeof(MakeRegularPost.Result), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(MakeRegularPost.Result), StatusCodes.Status200OK)]
         public async Task<ActionResult<MakeRegularPost.Result>> PostRegularAsync([FromBody] MakeRegularPost.Command command)

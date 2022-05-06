@@ -1,14 +1,13 @@
-﻿using KatsumiApp.V1.Application.Exceptions.Post;
-using KatsumiApp.V1.Application.Features.Post.Shared.UseCases;
+﻿using FluentValidation;
+using KatsumiApp.V1.Application.Features.Post.UseCases;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace KatsumiApp.V1.Application.Features.Post.Shared
+namespace KatsumiApp.V1.Application.Features.Post
 {
-
     [ApiController]
     [ControllerName("Post")]
     [Route("api/v{version:apiVersion}/post")]
@@ -16,7 +15,6 @@ namespace KatsumiApp.V1.Application.Features.Post.Shared
     [ApiVersion("1.0")]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-
     public class SharedPostController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -43,7 +41,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Shared
 
                 return NoContent();
             }
-            catch (OriginalPostNotFoundException ex)
+            catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
             }

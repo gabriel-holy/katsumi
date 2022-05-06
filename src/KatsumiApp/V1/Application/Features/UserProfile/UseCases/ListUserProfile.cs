@@ -9,7 +9,7 @@ using Raven.Client.Documents.Session;
 using System.Collections.Generic;
 using KatsumiApp.V1.Application.Models.Post;
 using KatsumiApp.V1.Data.Raven.Contexts;
-using KatsumiApp.V1.DomainEvents.Features.UserProfile;
+using KatsumiApp.V1.Application.Features.UserProfile.DomainEvents;
 
 namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 {
@@ -27,9 +27,11 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var userProfile = new Result();/* (await _userProfileContext.UsersProfiles
-                                                            .FirstOrDefaultAsync(user => user.Username == command.Username, cancellationToken: cancellationToken))
-                                                            .MapFromDomain(); ;*/
+                using var databaseSession = UserProfileContext.DocumentStore.OpenAsyncSession();
+
+                var userProfile = (await databaseSession.Query<Models.UserProfile>()
+                                                        .FirstOrDefaultAsync(user => user.Username == command.Username, cancellationToken))
+                                                        .MapFromDomain();
 
                 if (userProfile == null)
                 {
@@ -99,7 +101,6 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 
             private async Task<IEnumerable<RegularPost>> FetchRegularPostsByUsername(string username)
                 => null; /* await _regularPostContext
-
                         .RegularPosts
                             .Include(i => i.PostContent)
                                 .ThenInclude(i => i.Keywords)

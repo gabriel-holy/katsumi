@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using KatsumiApp.V1.Data.Raven.Contexts;
 
-namespace KatsumiApp.V1.Application.Features.Post.Regular.UseCases
+namespace KatsumiApp.V1.Application.Features.Post.UseCases
 {
     public class MakeRegularPost
     {

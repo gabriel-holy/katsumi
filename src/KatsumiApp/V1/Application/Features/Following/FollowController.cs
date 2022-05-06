@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
-using KatsumiApp.V1.Application.Features.Following.Follow.UseCases;
+using KatsumiApp.V1.Application.Features.Following.UseCases;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace KatsumiApp.V1.Application.Features.Following.Follow
+namespace KatsumiApp.V1.Application.Features.Following
 {
     [ApiController]
     [ControllerName("Following")]
