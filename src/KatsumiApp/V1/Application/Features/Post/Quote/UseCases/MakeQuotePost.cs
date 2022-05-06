@@ -3,9 +3,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using KatsumiApp.V1.Application.Models.Post;
-using Microsoft.EntityFrameworkCore;
 using KatsumiApp.V1.Application.Exceptions.Post;
-using KatsumiApp.V1.Data.EntityFramework.Contexts;
+using Raven.Client.Documents;
+using KatsumiApp.V1.Data.Raven.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Post.Quote.UseCases
 {
@@ -13,31 +13,24 @@ namespace KatsumiApp.V1.Application.Features.Post.Quote.UseCases
     {
         public class Handler : IRequestHandler<Command, Result>
         {
-            private readonly PostContext.QuotePostContext _quotePostContext;
-            private readonly PostContext.RegularPostContext _regularPostContext;
-
-            public Handler(
-                PostContext.QuotePostContext quotePostContext,
-                PostContext.RegularPostContext regularPostContext
-                )
-            {
-                _quotePostContext = quotePostContext ?? throw new ArgumentNullException(nameof(quotePostContext));
-                _regularPostContext = regularPostContext ?? throw new ArgumentNullException(nameof(regularPostContext));
-            }
-
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var originalPost = await _regularPostContext.RegularPosts.FirstOrDefaultAsync(p => p.Id == command.OrigitalPostId, cancellationToken);
+                using var quotePostDatabaseSession = PostContext.QuotePostContext.DocumentStore.OpenAsyncSession();
+
+                var originalPost = await quotePostDatabaseSession
+                                         .Query<QuotePost>()
+                                         .FirstOrDefaultAsync(p => p.Id == command.OriginalPostId, cancellationToken);
 
                 if (originalPost == null)
                 {
-                    throw new OriginalPostNotFoundException(command.OrigitalPostId);
+                    throw new OriginalPostNotFoundException(command.OriginalPostId);
                 }
 
                 var quote = command.MapToDomain();
 
-                await _quotePostContext.AddAsync(quote, cancellationToken);
-                await _quotePostContext.SaveChangesAsync(cancellationToken);
+                await quotePostDatabaseSession.StoreAsync(quote, cancellationToken);
+
+                await quotePostDatabaseSession.SaveChangesAsync(cancellationToken);
 
                 var result = quote.MapFromDomain();
 
@@ -49,7 +42,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Quote.UseCases
         {
             public string Username { get; set; }
             public string Comment { get; set; }
-            public string OrigitalPostId { get; set; }
+            public string OriginalPostId { get; set; }
 
         }
 
@@ -76,7 +69,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Quote.UseCases
                 Username = command.Username,
                 CreatedAtUtc = DateTime.UtcNow,
                 Comment = command.Comment,
-                OriginalPostId = command.OrigitalPostId,
+                OriginalPostId = command.OriginalPostId,
             };
         }
     }

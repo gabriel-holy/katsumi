@@ -18,7 +18,6 @@ namespace KatsumiApp.V1.Data.Raven.Contexts
             return following;
         });
 
-
-        public static IDocumentStore Following => _lazyFollowing.Value;
+        public static IDocumentStore DocumentStore => _lazyFollowing.Value;
     }
 }

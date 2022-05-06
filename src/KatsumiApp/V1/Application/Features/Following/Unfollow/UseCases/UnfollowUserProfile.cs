@@ -2,7 +2,6 @@
 using FluentValidation;
 using MediatR;
 using System;
-using System.Linq;
 using Raven.Client.Documents;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,11 +23,11 @@ namespace KatsumiApp.V1.Application.Features.Following.Unfollow.UseCases
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                using var databaseSession = FollowingContext.Following.OpenAsyncSession();
+                using var databaseSession = FollowingContext.DocumentStore.OpenAsyncSession();
 
                 var following = await databaseSession
                                          .Query<Models.Following>()
-                                         .SingleOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername, token: cancellationToken);
+                                         .FirstOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername, token: cancellationToken);
 
                 if (following is null)
                 {

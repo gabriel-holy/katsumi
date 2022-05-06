@@ -1,12 +1,11 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using KatsumiApp.V1.Application.Models.Post;
 using System.Collections.Generic;
 using System.Linq;
-using KatsumiApp.V1.Data.EntityFramework.Contexts;
+using KatsumiApp.V1.Data.Raven.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Post.Regular.UseCases
 {
@@ -14,19 +13,16 @@ namespace KatsumiApp.V1.Application.Features.Post.Regular.UseCases
     {
         public class Handler : IRequestHandler<Command, Result>
         {
-            private readonly PostContext.RegularPostContext _regularPostContext;
-
-            public Handler(PostContext.RegularPostContext regularPostContext, IMapper mapper)
-            {
-                _regularPostContext = regularPostContext ?? throw new ArgumentNullException(nameof(regularPostContext));
-            }
-
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
+
                 var post = command.MapToDomain();
 
-                await _regularPostContext.AddAsync(post, cancellationToken);
-                await _regularPostContext.SaveChangesAsync(cancellationToken);
+                using var databaseSession = PostContext.RegularPostContext.DocumentStore.OpenAsyncSession();
+
+                await databaseSession.StoreAsync(post, cancellationToken);
+
+                await databaseSession.SaveChangesAsync(cancellationToken);
 
                 var result = post.MapFromDomain();
 
@@ -68,7 +64,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Regular.UseCases
                 PostContent = new RegularPost.Content()
                 {
                     Title = command.Title,
-                    Keywords = new List<RegularPost.Content.Keyword>(command.Keywords.Select(keyword => new RegularPost.Content.Keyword(keyword))),
+                    Keywords = new List<string>(command.Keywords.Select(x => x)),
                     Text = command.Text,
                     Media = command.Media,
                 }

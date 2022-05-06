@@ -19,26 +19,12 @@ namespace KatsumiApp.V1.Application.Models.Post
         public string Type { get => PostType.Regular.ToString(); }
         public Content PostContent { get; set; }
 
-        public class Content
+        public record Content
         {
-            public string Id { get; set; }
             public string Title { get; set; }
             public string Text { get; set; }
             public string Media { get; set; }
-            public IEnumerable<Keyword> Keywords { get; set; }
-
-            public class Keyword
-            {
-                public Keyword(string keyvalue)
-                {
-                    Keyvalue = keyvalue;
-                }
-
-                public string Id { get; set; }
-                public string Keyvalue { get; set; }
-            }
+            public IEnumerable<string> Keywords { get; set; }
         }
     }
-
-
 }

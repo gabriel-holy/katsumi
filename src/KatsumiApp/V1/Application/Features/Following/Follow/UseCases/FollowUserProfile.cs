@@ -25,11 +25,11 @@ namespace KatsumiApp.V1.Application.Features.Following.Follow.UseCases
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                using var databaseSession = FollowingContext.Following.OpenAsyncSession();
+                using var databaseSession = FollowingContext.DocumentStore.OpenAsyncSession();
 
                 var following = await databaseSession.Query<Models.Following>()
                                                .Statistics(out QueryStatistics databaseSessionStatistics)
-                                               .SingleOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername,
+                                               .FirstOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername,
                                                                           token: cancellationToken);
 
                 if (following is null)
@@ -64,6 +64,7 @@ namespace KatsumiApp.V1.Application.Features.Following.Follow.UseCases
 
         public class Result
         {
+            public string Id { get; set; }
             public bool FollowingIsActive { get; set; }
         }
 

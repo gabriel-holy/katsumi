@@ -4,8 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using KatsumiApp.V1.Application.Models.Post;
 using KatsumiApp.V1.Application.Exceptions.Post;
-using Microsoft.EntityFrameworkCore;
-using KatsumiApp.V1.Data.EntityFramework.Contexts;
+using Raven.Client.Documents;
+using KatsumiApp.V1.Data.Raven.Contexts;
 
 namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
 {
@@ -13,28 +13,24 @@ namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
     {
         public class Handler : IRequestHandler<Command, Result>
         {
-            private readonly PostContext.SharedPostContext _sharedPostContext;
-            private readonly PostContext.RegularPostContext _regularPostContext;
-
-            public Handler(PostContext.SharedPostContext sharedPostContext, PostContext.RegularPostContext regularPostContext)
-            {
-                _sharedPostContext = sharedPostContext ?? throw new ArgumentNullException(nameof(sharedPostContext));
-                _regularPostContext = regularPostContext ?? throw new ArgumentNullException(nameof(regularPostContext)); ;
-            }
-
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var originalPost = await _regularPostContext.RegularPosts.FirstOrDefaultAsync(p => p.Id == command.OrigitalPostId, cancellationToken);
+                using var regularPostDatabaseSession = PostContext.RegularPostContext.DocumentStore.OpenAsyncSession();
+
+                var originalPost = await regularPostDatabaseSession.Query<RegularPost>().FirstOrDefaultAsync(p => p.Id == command.OriginalPostId, cancellationToken);
 
                 if (originalPost == null)
                 {
-                    throw new OriginalPostNotFoundException(command.OrigitalPostId);
+                    throw new OriginalPostNotFoundException(command.OriginalPostId);
                 }
+
+                using var sharedPostDatabaseSession = PostContext.SharedPostContext.DocumentStore.OpenAsyncSession();
 
                 var sharing = command.MapToDomain();
 
-                await _sharedPostContext.AddAsync(sharing, cancellationToken);
-                await _sharedPostContext.SaveChangesAsync(cancellationToken);
+                await sharedPostDatabaseSession.StoreAsync(sharing, cancellationToken);
+
+                await sharedPostDatabaseSession.SaveChangesAsync(cancellationToken);
 
                 var result = sharing.MapFromDomain();
 
@@ -44,7 +40,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
 
         public class Command : IRequest<Result>
         {
-            public string OrigitalPostId { get; set; }
+            public string OriginalPostId { get; set; }
             public string Username { get; set; }
         }
 
@@ -70,7 +66,7 @@ namespace KatsumiApp.V1.Application.Features.Post.Shared.UseCases
             {
                 Username = command.Username,
                 CreatedAtUtc = DateTime.UtcNow,
-                OriginalPostId = command.OrigitalPostId,    
+                OriginalPostId = command.OriginalPostId,
             };
         }
     }

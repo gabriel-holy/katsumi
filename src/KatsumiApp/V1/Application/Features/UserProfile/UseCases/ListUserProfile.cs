@@ -5,10 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
 using System.Collections.Generic;
 using KatsumiApp.V1.Application.Models.Post;
 using KatsumiApp.V1.Data.Raven.Contexts;
-using Raven.Client.Documents.Session;
+
 
 namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 {
@@ -43,7 +44,7 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 
             private async Task BuildUserProfileComplementaryData(Result userProfileToBuild, string viewerUserName)
             {
-                using var followingDatabaseSession = FollowingContext.Following.OpenAsyncSession();
+                using var followingDatabaseSession = FollowingContext.DocumentStore.OpenAsyncSession();
 
                 var fetchTotalFollowersTask = FetchTotalFollowersByUsername(userProfileToBuild.Username, followingDatabaseSession);
                 var fetchTotalFollowingTask = FetchTotalFollowingByUsername(userProfileToBuild.Username, followingDatabaseSession);
