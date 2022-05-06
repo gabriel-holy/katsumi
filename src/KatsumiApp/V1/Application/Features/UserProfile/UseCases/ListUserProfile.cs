@@ -9,7 +9,7 @@ using Raven.Client.Documents.Session;
 using System.Collections.Generic;
 using KatsumiApp.V1.Application.Models.Post;
 using KatsumiApp.V1.Data.Raven.Contexts;
-
+using KatsumiApp.V1.DomainEvents.Features.UserProfile;
 
 namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 {
@@ -18,10 +18,11 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
         public class Handler : IRequestHandler<Command, Result>
         {
             private readonly IMapper _mapper;
-
-            public Handler(IMapper mapper)
+            private readonly IMediator _mediator;
+            public Handler(IMapper mapper, IMediator mediator)
             {
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+                _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             }
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
@@ -38,6 +39,8 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                 await BuildUserProfileComplementaryData(userProfile, command.ViewerUsername);
 
                 var result = userProfile;
+
+                await _mediator.Send(new UserProfileCreatedEvent.Command(), cancellationToken);
 
                 return result;
             }
@@ -171,7 +174,6 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
             {
                 if (Feed == null) Feed = new UserFeed();
             }
-
             public string Id { get; set; }
             public string Username { get; set; }
             public DateTime JoinedSocialMediaAt { get; set; }

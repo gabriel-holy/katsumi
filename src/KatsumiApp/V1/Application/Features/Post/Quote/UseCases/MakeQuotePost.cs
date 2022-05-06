@@ -3,9 +3,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using KatsumiApp.V1.Application.Models.Post;
-using KatsumiApp.V1.Application.Exceptions.Post;
 using Raven.Client.Documents;
 using KatsumiApp.V1.Data.Raven.Contexts;
+using KatsumiApp.V1.Application.Exceptions.Post;
 
 namespace KatsumiApp.V1.Application.Features.Post.Quote.UseCases
 {

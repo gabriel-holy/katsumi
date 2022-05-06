@@ -36,4 +36,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="V1\Data\EventBus\" />
+    <Folder Include="V1\Data\Kafka\" />
+    <Folder Include="V1\Data\RabbitMQ\" />
+  </ItemGroup>
+
 </Project>
