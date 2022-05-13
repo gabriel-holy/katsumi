@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Serilog;
 using KatsumiApp.V1.Application.Features.Post.UseCases;
 
-namespace KatsumiApp.V1.Application.Features.Post
+namespace KatsumiApp.V1.Application.Features.Post.Controllers
 {
 
     [ApiController]

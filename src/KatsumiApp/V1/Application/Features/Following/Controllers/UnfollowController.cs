@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using KatsumiApp.V1.Application.Features.Following.UseCases;
 
-namespace KatsumiApp.V1.Application.Features.Following
+namespace KatsumiApp.V1.Application.Features.Following.Controllers
 {
     [ApiController]
     [ControllerName("Following")]

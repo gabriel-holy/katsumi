@@ -82,9 +82,6 @@ namespace KatsumiApp
 
             mapper.ConfigurationProvider.AssertConfigurationIsValid();
 
-            //app.Seed<FollowingContext>();
-            //app.Seed<UserProfileContext>();
-
             app.UseSwagger();
 
             app.UseSwaggerUI(swaggerOptions =>

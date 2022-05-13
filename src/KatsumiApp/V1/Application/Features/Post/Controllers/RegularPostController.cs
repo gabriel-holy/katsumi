@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace KatsumiApp.V1.Application.Features.Post
+namespace KatsumiApp.V1.Application.Features.Post.Controllers
 {
 
     [ApiController]

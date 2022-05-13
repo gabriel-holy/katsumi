@@ -1,7 +1,8 @@
-﻿using KatsumiApp.V1.Application.Models.Post.Enum;
-using System;
+﻿using System;
+using KatsumiApp.V1.Application.Domain.Enum;
+using KatsumiApp.V1.Application.Domain;
 
-namespace KatsumiApp.V1.Application.Models.Post
+namespace KatsumiApp.V1.Application.Domain
 {
     public class SharedPost
     {

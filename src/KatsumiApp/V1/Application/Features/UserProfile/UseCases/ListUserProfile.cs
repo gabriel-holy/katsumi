@@ -7,9 +7,9 @@ using System.Linq;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using System.Collections.Generic;
-using KatsumiApp.V1.Application.Models.Post;
 using KatsumiApp.V1.Data.Raven.Contexts;
 using KatsumiApp.V1.Application.Features.UserProfile.DomainEvents;
+using KatsumiApp.V1.Application.Domain;
 
 namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 {
@@ -29,7 +29,7 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
             {
                 using var databaseSession = UserProfileContext.DocumentStore.OpenAsyncSession();
 
-                var userProfile = (await databaseSession.Query<Models.UserProfile>()
+                var userProfile = (await databaseSession.Query<KatsumiApp.V1.Application.Domain.UserProfile>()
                                                         .FirstOrDefaultAsync(user => user.Username == command.Username, cancellationToken))
                                                         .MapFromDomain();
 
@@ -54,7 +54,7 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                 var fetchTotalFollowersTask = FetchTotalFollowersByUsername(userProfileToBuild.Username, followingDatabaseSession);
                 var fetchTotalFollowingTask = FetchTotalFollowingByUsername(userProfileToBuild.Username, followingDatabaseSession);
                 var fetchFollowingBetweenUsersTask = FetchFollowingBetweenUsers(viewerUserName, userProfileToBuild.Username, followingDatabaseSession);
-                var fetchUserFeed = FetchUserFeed(userProfileToBuild.Username);
+                var fetchUserFeed = FetchUserFeed(userProfileToBuild.Username, followingDatabaseSession);
 
                 await Task.WhenAll(fetchTotalFollowersTask, fetchTotalFollowingTask, fetchFollowingBetweenUsersTask, fetchUserFeed);
 
@@ -64,11 +64,11 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                 userProfileToBuild.Feed = await fetchUserFeed;
             }
 
-            private async Task<Result.UserFeed> FetchUserFeed(string username)
+            private async Task<Result.UserFeed> FetchUserFeed(string username, IAsyncDocumentSession databaseSession)
             {
-                var regularPosts = FetchRegularPostsByUsername(username);
-                var sharedPosts = FetchSharedPostsByUsername(username);
-                var quotePosts = FetchQuotePostsByUsername(username);
+                var regularPosts = FetchRegularPostsByUsername(username, databaseSession);
+                var sharedPosts = FetchSharedPostsByUsername(username, databaseSession);
+                var quotePosts = FetchQuotePostsByUsername(username, databaseSession);
 
                 await Task.WhenAll(regularPosts, sharedPosts, quotePosts);
 
@@ -81,25 +81,8 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                 return userFeed;
             }
 
-            private static async Task<IList<object>> ApplyOrdenationAndSizingOnFeed(
-                Task<IEnumerable<RegularPost>> regularPosts,
-                Task<IEnumerable<SharedPost>> sharedPosts,
-                Task<IEnumerable<QuotePost>> quotePosts)
-            {
-                const int FeedUserProfileLimitThatShouldBeMigratedToAHotConfiguration = 5;
 
-                var postList = new List<dynamic>();
-
-                postList.AddRange(await regularPosts);
-                postList.AddRange(await sharedPosts);
-                postList.AddRange(await quotePosts);
-
-                postList = postList.OrderByDescending(post => post.CreatedAtUtc).ToList();
-
-                return postList.Take(FeedUserProfileLimitThatShouldBeMigratedToAHotConfiguration).ToList();
-            }
-
-            private async Task<IEnumerable<RegularPost>> FetchRegularPostsByUsername(string username)
+            private async Task<IEnumerable<RegularPost>> FetchRegularPostsByUsername(string username, IAsyncDocumentSession databaseSession)
                 => null; /* await _regularPostContext
                         .RegularPosts
                             .Include(i => i.PostContent)
@@ -110,8 +93,8 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                         .Take(5)
                         .ToListAsync();
                 */
-            private async Task<IEnumerable<SharedPost>> FetchSharedPostsByUsername(string username)
-                 => null;/* await _sharedPostContext
+            private async Task<IEnumerable<SharedPost>> FetchSharedPostsByUsername(string username, IAsyncDocumentSession databaseSession)
+                 => null; /* await _sharedPostContext
 
                          .SharedPosts
                              .Include(i => i.OriginalPost)
@@ -124,42 +107,54 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
                          .ToListAsync();
             */
 
-            private async Task<IEnumerable<QuotePost>> FetchQuotePostsByUsername(string username)
-                => null; /*await _quotePostContext
-
-                        .QuotePosts
-                            .Include(i => i.OriginalPost)
-                                .ThenInclude(i => i.PostContent)
-                                    .ThenInclude(i => i.Keywords)
-
-                        .Where(post => post.Username == username)
-                        .Where(post => post.Username == username)
-                        .OrderByDescending(post => post.CreatedAtUtc)
-                        .Take(5)
-                        .ToListAsync();*/
+            private async Task<IEnumerable<QuotePost>> FetchQuotePostsByUsername(string username, IAsyncDocumentSession databaseSession)
+            {
+                return await databaseSession
+                            .Query<QuotePost>()
+                            .Where(post => post.Username == username)
+                            .OrderByDescending(post => post.CreatedAtUtc)
+                            .Take(5)
+                            .ToListAsync();
+            }
 
             private static async Task<int> FetchTotalFollowersByUsername(string username, IAsyncDocumentSession databaseSession)
             {
                 return await databaseSession
-                             .Query<Models.Following>()
+                             .Query<KatsumiApp.V1.Application.Domain.Following>()
                              .Where(following => following.FollowingIsActive && following.FollowedUsername == username)
                              .CountAsync();
             }
             private static async Task<int> FetchTotalFollowingByUsername(string username, IAsyncDocumentSession databaseSession)
             {
                 return await databaseSession
-                             .Query<Models.Following>()
+                             .Query<KatsumiApp.V1.Application.Domain.Following>()
                              .Where(following => following.FollowingIsActive && following.FollowerUsername == username)
                              .CountAsync();
             }
-
             private static async Task<bool> FetchFollowingBetweenUsers(string viewerUsername, string username, IAsyncDocumentSession databaseSession)
             {
                 return await databaseSession
-                            .Query<Models.Following>()
+                            .Query<KatsumiApp.V1.Application.Domain.Following>()
                             .AnyAsync(following => following.FollowingIsActive &&
                                         following.FollowerUsername == viewerUsername &&
                                         following.FollowedUsername == username);
+            }
+            private static async Task<IList<object>> ApplyOrdenationAndSizingOnFeed(
+              Task<IEnumerable<RegularPost>> regularPosts,
+              Task<IEnumerable<SharedPost>> sharedPosts,
+              Task<IEnumerable<QuotePost>> quotePosts)
+            {
+                const int FeedUserProfileLimitThatShouldBeMigratedToAHotConfiguration = 5;
+
+                var postList = new List<dynamic>();
+
+                postList.AddRange(await regularPosts);
+                postList.AddRange(await sharedPosts);
+                postList.AddRange(await quotePosts);
+
+                postList = postList.OrderByDescending(post => post.CreatedAtUtc).ToList();
+
+                return postList.Take(FeedUserProfileLimitThatShouldBeMigratedToAHotConfiguration).ToList();
             }
         }
 
@@ -198,7 +193,7 @@ namespace KatsumiApp.V1.Application.Features.UserProfile.UseCases
 
     public static class Mapper
     {
-        public static ListUserProfile.Result MapFromDomain(this Models.UserProfile userProfile)
+        public static ListUserProfile.Result MapFromDomain(this KatsumiApp.V1.Application.Domain.UserProfile userProfile)
         {
             var result = new ListUserProfile.Result()
             {

@@ -2,9 +2,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Application.Models.Post;
 using Raven.Client.Documents;
 using KatsumiApp.V1.Data.Raven.Contexts;
+using KatsumiApp.V1.Application.Domain;
 
 namespace KatsumiApp.V1.Application.Features.Post.UseCases
 {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace KatsumiApp.V1.Application.Features.UserProfile
+namespace KatsumiApp.V1.Application.Features.UserProfile.Controllers
 {
 
     [ApiController]

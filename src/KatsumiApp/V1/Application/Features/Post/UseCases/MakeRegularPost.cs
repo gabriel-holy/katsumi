@@ -2,10 +2,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using KatsumiApp.V1.Application.Models.Post;
 using System.Collections.Generic;
 using System.Linq;
 using KatsumiApp.V1.Data.Raven.Contexts;
+using KatsumiApp.V1.Application.Domain;
+using static KatsumiApp.V1.Application.Domain.RegularPost;
 
 namespace KatsumiApp.V1.Application.Features.Post.UseCases
 {
@@ -61,7 +62,7 @@ namespace KatsumiApp.V1.Application.Features.Post.UseCases
             {
                 Username = command.Username,
                 CreatedAtUtc = DateTime.UtcNow,
-                PostContent = new RegularPost.Content()
+                PostContent = new Content()
                 {
                     Title = command.Title,
                     Keywords = new List<string>(command.Keywords.Select(x => x)),

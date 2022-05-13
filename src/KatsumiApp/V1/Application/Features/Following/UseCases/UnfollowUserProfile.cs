@@ -26,7 +26,7 @@ namespace KatsumiApp.V1.Application.Features.Following.UseCases
                 using var databaseSession = FollowingContext.DocumentStore.OpenAsyncSession();
 
                 var following = await databaseSession
-                                         .Query<Models.Following>()
+                                         .Query<KatsumiApp.V1.Application.Domain.Following>()
                                          .FirstOrDefaultAsync(f => f.FollowedUsername == command.FollowedUsername && f.FollowerUsername == command.FollowerUsername, token: cancellationToken);
 
                 if (following is null)
@@ -59,7 +59,7 @@ namespace KatsumiApp.V1.Application.Features.Following.UseCases
         {
             public Mapper()
             {
-                CreateMap<Models.Following, Result>();
+                CreateMap<KatsumiApp.V1.Application.Domain.Following, Result>();
             }
         }
 

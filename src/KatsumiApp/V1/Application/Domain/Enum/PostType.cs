@@ -1,4 +1,4 @@
-﻿namespace KatsumiApp.V1.Application.Models.Post.Enum
+﻿namespace KatsumiApp.V1.Application.Domain.Enum
 {
     public enum PostType
     {

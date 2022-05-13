@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace KatsumiApp.V1.Application.Features.Following
+namespace KatsumiApp.V1.Application.Features.Following.Controllers
 {
     [ApiController]
     [ControllerName("Following")]

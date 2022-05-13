@@ -1,4 +1,4 @@
-﻿namespace KatsumiApp.V1.Application.Models
+﻿namespace KatsumiApp.V1.Application.Domain
 {
     public class Following
     {
