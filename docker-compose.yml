@@ -1,7 +1,5 @@
 version: '3.9'
-
 services:
-
   rabbitmq: # login guest:guest
     image: rabbitmq:3-management
     hostname: "rabbitmq"
@@ -20,3 +18,20 @@ services:
     restart: always
     depends_on:
       - "rabbitmq"
+
+  ravenDB:
+    container_name: ravenDB
+    image: ravendb/ravendb
+    ports:
+      - 8080:8080
+      - 38888:38888
+    extra_hosts:
+      - "hostos:10.211.55.2"
+    environment:
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+      - RAVEN_Setup_Mode=None
+      - RAVEN_License_Eula_Accepted=true
+      - "RAVEN_ServerUrl=http://0.0.0.0:8080"
+      - "RAVEN_PublicServerUrl=http://hostos:8080"
+      - "RAVEN_ServerUrl_Tcp=tcp://0.0.0.0:38888"
+      - "RAVEN_PublicServerUrl_Tcp=tcp://hostos:38888"
