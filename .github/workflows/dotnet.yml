@@ -16,9 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
-    - name: Npm install
-      run: npm install
+        dotnet-version: 5.0.x
     - name: Restore dotnet
       run: dotnet restore
     - name: Build
